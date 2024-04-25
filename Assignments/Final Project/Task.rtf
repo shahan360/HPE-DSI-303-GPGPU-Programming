@@ -1,0 +1,47 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red42\green44\blue46;\red246\green247\blue249;}
+{\*\expandedcolortbl;;\cssrgb\c21569\c22745\c23529;\cssrgb\c97255\c97647\c98039;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\fs30 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Submission Instructions\
+Please provide compressed(zip, targz, etc.) final solutions to parts 1 & 2 below.\'a0 There is no need to include the input files.\'a0 Along with each set of solutions, please include a README.txt with execution/compilation instructions for your code.\
+Part 1\
+You are given a code (md.c) that does molecular dynamics simulations of inter-atomic interactions. You have to parallelize the code to use GPUs and compare the performance of the modified code with the original code execution on the CPU.\
+Hint: If you choose to use OpenACC directives to GPU parallelize the code then use the OpenMP pragma as a guide\
+(MD is a computer simulation technique where the time evolution of a set of interacting atoms is followed by integrating their equations of motion. Simply, we can follow the laws of classical mechanics, and most notably Newton\'92s law: Fi = mi*ai for each atom i in a system constituted by N atoms. Here, mi is the atom mass, ai = d2ri/dt2 is its acceleration, and Fi is the force acting upon it, due to the interactions with other atoms. Interactions can be divided into categories such as intramolecular interaction and intermolecular interaction. The former is modeled using harmonic approximations to describe the bonds and bends between atoms. The latter is modeled using Lennard-Jone's potential and Coulombic interactions to describe the interaction of point charges.)\
+Part 2\
+The goal of this exercise is to rank entries from an arbitrary chemical database of drug-like chemicals in terms of similarity with a known drug. 1,766 numerical features/values are computed for each chemical, and stored in the database file. Your task at a high level is to rank the database by similarity to this known drug in a contest of this feature space and recommend the top 10 ten most similar entries for purchase and further testing.\
+Exercise:\
+Read in the biological response feature dataset from the uncompressed version of the file named " bioresponse_descriptors_matrix.txt.zip".\'a0 You will need to unzip the file, before reading its data. Also, read in the biological response feature data for the known drug, which is in the file called "known_drug.txt" Both files are on the course page.\
+1) Write a Cuda kernel and C/C++ code that computes in parallel the following:\
+1a) The distance vector D, which captures the distance between every row in "bioresponse_descriptors_matrix.txt.zip" vs the only row in "known_drug.txt"\
+Note "known_drug.txt" has only one row while "bioresponse_descriptors_matrix.txt.zip" has 3k+ rows.\
+The distance metric to use is the \'93Minkowski\'94 distance metric is given the\
+dij= sum(|Xi - Xj|^p)^(1/p)\
+where p = 1.50\
+1b) Compute the similarity vector S, given the distance vector D.\
+using the approximation\
+Sij = exp(-Dij * gamma), where one heuristic for choosing gamma is 1.00 / num_features or a number of columns in matrix A.\
+2) Using Thrust library calls on the GPU, sort the similarity vector S from largest to smallest, send the sorted data to the host, and print out the index for the top 10 most similar entries. Sample code from stackflow provided to get sorted index rather than actual values can use as a template for your thrust code.\
+#include <iostream>\
+#include <vector>\
+#include <algorithm>\
+using namespace std;\
+int main() \{\
+\'a0vector<int> x = \{15, 3, 0, 20\};\
+\'a0vector<int> y(x.size());\
+\'a0 size_t n(0);\
+\'a0 std::generate(begin(y), end(y), [&]\{ return n++; \});\
+\'a0 std::sort( begin(y),
+\fs22\fsmilli11250 \'a0end(y),\'a0[&] (int i1, int i2) \{ return x[i1] < x[i2]; \} );
+\fs30 \
+\'a0 for (int i =0; i<y.size() ; i++ )\'a0
+\fs22\fsmilli11250 cout << y[i] << ' ';
+\fs30 \
+\'a0 return 0;\
+\}\
+}
